@@ -29,6 +29,9 @@ In general:
 
 ## How the tool works
 
+<img width="406" height="435" alt="StepFunction" src="https://github.com/user-attachments/assets/d89d66ff-abfa-4a0e-bf63-8b57113fc264" />
+
+
 AWS Lambda Power Tuning uses AWS Step Functions to invoke the same Lambda function multiple times with different memory settings and compare the results.
 
 The workflow typically looks like this:
@@ -58,6 +61,9 @@ This gives a side-by-side comparison of execution time and cost.
 ## My actual run
 
 I used AWS Lambda Power Tuning and then validated the result by manually testing the same workload in Postman.
+
+<img width="1767" height="927" alt="PowerTuning" src="https://github.com/user-attachments/assets/a0bd09e1-ab51-4b46-af63-1769276461f4" />
+
 
 ### Baseline test: 128 MB
 
@@ -150,6 +156,9 @@ For many Lambda workloads, the sweet spot is often in the 512 MB to 1024 MB rang
 The Step Function workflow used by Lambda Power Tuning is a smart way to compare the same Lambda under different memory sizes. It orchestrates a complex testing process into a reliable, repeatable flow.
 
 In my case, the run proved that moving from 128 MB to 512 MB resulted in a substantial improvement in performance and consistency, which made the higher memory configuration the clear winner for this workload.
+
+<img width="840" height="670" alt="Screenshot 2026-09-29 at 1 08 31 PM" src="https://github.com/user-attachments/assets/d9c92bf2-7165-40aa-b1db-35ad5d939922" />
+
 
 ## Files in this repository
 
