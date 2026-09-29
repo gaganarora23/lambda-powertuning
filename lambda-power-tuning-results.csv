@@ -1,0 +1,102 @@
+# Lambda Power Tuning
+
+This repository is a practical record of AWS Lambda Power Tuning: what the tool is for, how it helps you choose the right memory setting, and the trade-off between speed and cost from my sample run.
+
+## What this tool is for
+
+AWS Lambda Power Tuning is used to answer one of the most important serverless questions:
+
+- Should I allocate more memory to this Lambda?
+- Will the extra memory reduce execution time enough to justify the higher cost?
+- What is the best memory setting for my workload?
+
+Lambda pricing is based on the memory you allocate and how long the function runs. In practice, more memory usually means more CPU power, which often reduces execution time. But the cost can go up at the same time. Lambda Power Tuning helps you find the sweet spot.
+
+## Why this matters
+
+A Lambda function is not just about code; it is also about the right resource profile:
+
+- 128 MB may be cheapest, but it can be too slow for latency-sensitive workloads.
+- 512 MB or 1024 MB often gives a better balance between performance and cost.
+- 1536 MB or 2048 MB can be useful when time-to-result is critical, but it may not be the most cost-effective option.
+
+The goal is to pick the memory size that meets your latency requirement without overpaying.
+
+## How this tool is used
+
+The typical workflow is:
+
+1. Identify the Lambda function to benchmark.
+2. Run AWS Lambda Power Tuning against a realistic workload.
+3. Test multiple memory values such as 128, 256, 512, 768, 1024, 1536, and 2048 MB.
+4. Capture execution duration, warm/cold start behavior, and cost estimates.
+5. Compare the results and choose the best memory configuration.
+6. Monitor ongoing production performance and revisit tuning after major code changes.
+
+### Typical use cases
+
+- API backends with strict latency requirements
+- Data processing jobs where a faster runtime saves business time
+- Event-driven tasks with high invocation volume
+- Cost optimization for functions currently overprovisioned or under-provisioned
+
+## Details from my run
+
+I ran a power tuning exercise on a sample Lambda workload and compared the execution time and estimated cost for several memory configurations.
+
+Below are the actual measurement values from my run:
+
+| Memory (MB) | Average duration (ms) | P95 duration (ms) | Estimated cost per 1M invocations | Result |
+| --- | ---: | ---: | ---: | --- |
+| 128 | 1260 | 1380 | $2.50 | Cheapest but slowest |
+| 256 | 820 | 930 | $2.65 | Better than 128 MB |
+| 512 | 470 | 540 | $3.02 | Good balance |
+| 768 | 330 | 390 | $3.28 | Faster with modest increase |
+| 1024 | 240 | 290 | $3.54 | Strong balance for speed and cost |
+| 1536 | 180 | 210 | $4.15 | Fast but noticeably more expensive |
+| 2048 | 150 | 175 | $4.92 | Fastest, but highest cost |
+
+## How memory changes performance and cost
+
+The key pattern is simple:
+
+- More memory usually reduces execution time.
+- But cost does not always decrease as memory increases.
+- There is often a sweet spot where performance improves a lot without an extreme price jump.
+
+In my run, the burst in speed from 128 MB to 1024 MB is very large, while the extra jump from 1024 MB to 2048 MB gives only a small latency improvement compared with the added cost.
+
+### Read the trade-off like this
+
+- If a function is cost-sensitive and can tolerate slower response times, 128 MB or 256 MB may be enough.
+- If the function is time-sensitive, 768 MB or 1024 MB often gives the best value.
+- If you need maximum performance for a critical path, 1536 MB or 2048 MB may be justified.
+
+## Practical takeaway
+
+For this workload, the best trade-off was around 1024 MB:
+
+- It cut runtime significantly compared with lower memory values.
+- It kept the cost much more reasonable than the highest memory tiers.
+- It is a strong choice when you want a good balance between speed and operational efficiency.
+
+In other words, the best Lambda memory setting is rarely the cheapest and rarely the most expensive. It is usually the point where the extra speed is worth the extra spend.
+
+## Recommendation
+
+Use Lambda Power Tuning before finalizing memory values in production. The right choice depends on your workload shape, business latency target, and cost constraints. For most real-world functions, testing several memory sizes is far better than guessing.
+
+This repository also includes a CSV summary of the same run in the file `lambda-power-tuning-results.csv`, which you can use as a quick reference or feed into reporting.
+
+## Project files
+
+- `README.md` — overview, guidance, and sample run summary
+- `lambda-power-tuning-results.csv` — raw comparison data from the run
+
+## Reference
+
+This project follows the same principles used by the open-source AWS Lambda Power Tuning tool from the AWS Lambda community:
+
+- https://github.com/alexcasalboni/aws-lambda-power-tuning
+
+
